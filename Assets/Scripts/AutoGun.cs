@@ -17,7 +17,8 @@ public class AutoGun : MonoBehaviour
 
     private IEnumerator StartShooting()
     {
-        bool shooting = enabled;
+        var shooting = enabled;
+        var delay = new WaitForSeconds(_reloadDelay);
 
         while (shooting)
         {
@@ -25,7 +26,7 @@ public class AutoGun : MonoBehaviour
             var bullet = CreateBullet(directionToTarget);
             SetBulletDirectionAndSpeed(directionToTarget, bullet);
 
-            yield return new WaitForSeconds(_reloadDelay);
+            yield return delay;
         }
     }
 

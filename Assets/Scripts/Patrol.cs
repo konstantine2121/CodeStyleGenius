@@ -2,40 +2,51 @@ using UnityEngine;
 
 public class Patrol : MonoBehaviour
 {
-    public float _float;
-    public Transform AllPlacespoint;
-    private Transform[] arrayPlaces;
-    private int NumberOfPlaceInArrayPlaces;
+    [SerializeField] private float _movementSpeed;
+    [SerializeField] private Transform _waypointsHolder;
 
-    void Start()
+    private Transform[] _waypoints;
+    private int _indexOfCurrentWaypoint;
+
+    private void Start()
     {
-        arrayPlaces = new Transform[AllPlacespoint.childCount];
-
-        for (int abcd = 0; abcd < AllPlacespoint.childCount; abcd++)
-            arrayPlaces[abcd] = AllPlacespoint.GetChild(abcd).GetComponent<Transform>();
+        UpdateWaypoints();
     }
 
-    public void Update()
+    private void Update()
     {
-        var _pointByNumberInArray = arrayPlaces[NumberOfPlaceInArrayPlaces];
-        transform.position = Vector3.MoveTowards(transform.position, _pointByNumberInArray.position, _float * Time.deltaTime);
-
-        if (transform.position == _pointByNumberInArray.position) 
-            NextPlaceTakerLogic();
+        Move();
     }
 
-    public Vector3 NextPlaceTakerLogic()
+    private void UpdateWaypoints()
     {
-        NumberOfPlaceInArrayPlaces++;
+        _waypoints = new Transform[_waypointsHolder.childCount];
 
-        if (NumberOfPlaceInArrayPlaces == arrayPlaces.Length)
-            NumberOfPlaceInArrayPlaces = 0;
-
-        var thisPointVector = arrayPlaces[NumberOfPlaceInArrayPlaces].transform.position;
-        transform.forward = thisPointVector - transform.position;
-
-        return thisPointVector;
+        for (int i = 0; i < _waypointsHolder.childCount; i++)
+        {
+            _waypoints[i] = _waypointsHolder.GetChild(i);
+        }
     }
 
+    private void Move()
+    {
+        var waypoint = _waypoints[_indexOfCurrentWaypoint];
+        transform.position = Vector3.MoveTowards(transform.position, waypoint.position, _movementSpeed * Time.deltaTime);
 
+        if (transform.position == waypoint.position)
+        {
+            SwitchDirectionToNextWaypoint();
+        }
+    }
+
+    private void SwitchDirectionToNextWaypoint()
+    {
+        _indexOfCurrentWaypoint++;
+
+        if (_indexOfCurrentWaypoint >= _waypoints.Length)
+            _indexOfCurrentWaypoint = 0;
+
+        var waypointPosition = _waypoints[_indexOfCurrentWaypoint].position;
+        transform.forward = waypointPosition - transform.position;
+    }
 }
