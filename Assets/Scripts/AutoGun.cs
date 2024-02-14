@@ -1,30 +1,34 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class AutoGun : MonoBehaviour
 {
     [SerializeField] private float _bulletSpeed;
-    [SerializeField] private GameObject _bulletPrefab;
+    [SerializeField] private Rigidbody _bulletPrefab;
     [SerializeField] private float _reloadDelay;
+    [SerializeField] private Transform _target;
 
-    public Transform target;
+    public Transform Target 
+    { 
+        get => _target; 
+        set => _target = value; 
+    }
 
     private void Start()
     {
-        StartCoroutine(StartShooting());
+        StartCoroutine(Shooting());
     }
 
-    private IEnumerator StartShooting()
+    private IEnumerator Shooting()
     {
         var shooting = enabled;
         var delay = new WaitForSeconds(_reloadDelay);
 
         while (shooting)
         {
-            var directionToTarget = GetDirectionToTarget();
-            var bullet = CreateBullet(directionToTarget);
-            SetBulletDirectionAndSpeed(directionToTarget, bullet);
+            Vector3 directionToTarget = GetDirectionToTarget();
+            Rigidbody bullet = CreateBullet(directionToTarget);
+            SetBulletDirection(directionToTarget, bullet);
 
             yield return delay;
         }
@@ -32,17 +36,18 @@ public class AutoGun : MonoBehaviour
 
     private Vector3 GetDirectionToTarget()
     {
-        return (target.position - transform.position).normalized;
+        return Target != null ?
+            (Target.position - transform.position).normalized : 
+            Vector3.zero;
     }
 
-    private GameObject CreateBullet(Vector3 directionToTarget)
+    private Rigidbody CreateBullet(Vector3 directionToTarget)
     {
         return Instantiate(_bulletPrefab, transform.position + directionToTarget, Quaternion.identity);
     }
 
-    private void SetBulletDirectionAndSpeed(Vector3 directionToTarget, GameObject bullet)
+    private void SetBulletDirection(Vector3 directionToTarget, Rigidbody bulletRigidbody)
     {
-        var bulletRigidbody = bullet.GetComponent<Rigidbody>();
         bulletRigidbody.transform.up = directionToTarget;
         bulletRigidbody.velocity = directionToTarget * _bulletSpeed;
     }

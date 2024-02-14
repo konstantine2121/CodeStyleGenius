@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Patrol : MonoBehaviour
+public class Patroller : MonoBehaviour
 {
     [SerializeField] private float _movementSpeed;
     [SerializeField] private Transform _waypointsHolder;
@@ -41,10 +41,7 @@ public class Patrol : MonoBehaviour
 
     private void SwitchDirectionToNextWaypoint()
     {
-        _indexOfCurrentWaypoint++;
-
-        if (_indexOfCurrentWaypoint >= _waypoints.Length)
-            _indexOfCurrentWaypoint = 0;
+        _indexOfCurrentWaypoint = (_indexOfCurrentWaypoint + 1) % _waypoints.Length;
 
         var waypointPosition = _waypoints[_indexOfCurrentWaypoint].position;
         transform.forward = waypointPosition - transform.position;
